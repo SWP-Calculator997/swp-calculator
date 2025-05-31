@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro SWP Calculator | Financial Planning Tool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Light Theme */
+            --light-bg: #f8f9fa;
+            --light-card: #ffffff;
+            --light-text: #343a40;
+            --light-primary: #4361ee;
+            --light-secondary: #3f37c9;
+            --light-accent: #4895ef;
+            --light-border: #e9ecef;
+            --light-success: #4cc9f0;
+            --light-warning: #f72585;
+            --light-chart-bg: #ffffff;
+            
+            /* Dark Theme */
+            --dark-bg: #121826;
+            --dark-card: #1e293b;
+            --dark-text: #e2e8f0;
+            --dark-primary: #6366f1;
+            --dark-secondary: #818cf8;
+            --dark-accent: #60a5fa;
+            --dark-border: #334155;
+            --dark-success: #22d3ee;
+            --dark-warning: #f472b6;
+            --dark-chart-bg: #1e293b;
+            
+            /* Common */
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        .dark-theme {
+            --bg: var(--dark-bg);
+            --card: var(--dark-card);
+            --text: var(--dark-text);
+            --primary: var(--dark-primary);
+            --secondary: var(--dark-secondary);
+            --accent: var(--dark-accent);
+            --border: var(--dark-border);
+            --success: var(--dark-success);
+            --warning: var(--dark-warning);
+            --chart-bg: var(--dark-chart-bg);
+        }
+        
+        .light-theme {
+            --bg: var(--light-bg);
+            --card: var(--light-card);
+            --text: var(--light-text);
+            --primary: var(--light-primary);
+            --secondary: var(--light-secondary);
+            --accent: var(--light-accent);
+            --border: var(--light-border);
+            --success: var(--light-success);
+            --warning: var(--light-warning);
+            --chart-bg: var(--light-chart-bg);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+        
+        body {
+            font-family: 'Poppins', 'Roboto', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 30px 20px;
+            line-height: 1.6;
+            background-image: linear-gradient(135deg, var(--bg) 0%, var(--card) 100%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        /* Theme Switcher */
+        .theme-switcher {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card);
+            padding: 8px 15px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            border: 1px solid var(--border);
+        }
+        
+        .theme-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text);
+        }
+        
+        .theme-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Calculator Card */
+        .calculator-card {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 40px;
+            border: 1px solid var(--border);
+            max-width: 900px;
+            margin: 0 auto 50px;
+        }
+        
+        .calculator-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .calculator-header h2 {
+            font-weight: 600;
+            font-size: 1.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .calculator-body {
+            padding: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.05rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .input-wrapper input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+        
+        .input-wrapper span {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text);
+            opacity: 0.7;
+            font-weight: 500;
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        /* Results */
+        .result-card {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 35px;
+            display: none;
+            border: 1px solid var(--border);
+            max-width: 1200px;
+            margin: 0 auto 50px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-header h3 {
+            font-size: 1.6rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .summary-item {
+            background: var(--bg);
+            padding: 22px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+        
+        .summary-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-item h4 {
+            font-size: 1rem;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 12px;
+        }
+        
+        .summary-item p {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .warning-banner {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--warning);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(247, 37, 133, 0.2);
+        }
+        
+        .chart-container {
+            height: 350px;
+            margin: 40px 0;
+            position: relative;
+            background: var(--chart-bg);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .result-table th {
+            background-color: var(--bg);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .result-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .result-table tr:hover {
+            background-color: var(--bg);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .feature-card p {
+            color: var(--text);
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+        
+        /* Toggle */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 12px;
+            justify-content: space-between;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+                margin-top: 20px;
+            }
+            
+            .theme-switcher {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 0 auto 20px;
+                width: fit-content;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <div class="container">
+        <div class="theme-switcher">
+            <button class="theme-btn active" id="light-theme-btn" title="Light Mode">
+                <i class="fas fa-sun"></i>
+            </button>
+            <button class="theme-btn" id="dark-theme-btn" title="Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        
+        <div class="header">
+            <h1>Professional SWP Calculator</h1>
+            <p>Plan your financial future with precision. Calculate systematic withdrawals for investments.</p>
+        </div>
+        
+        <div class="calculator-card">
+            <div class="calculator-header">
+                <h2><i class="fas fa-calculator"></i> Calculate Your Withdrawal Plan</h2>
+            </div>
+            <div class="calculator-body">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="principal"><i class="fas fa-piggy-bank"></i> Initial Investment</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="principal" placeholder="e.g. 1000000" value="5000000">
+                            <span>₹</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="rate"><i class="fas fa-chart-line"></i> Expected Annual Return</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="rate" placeholder="e.g. 8" value="8">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="withdrawal"><i class="fas fa-wallet"></i> Monthly Withdrawal</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="withdrawal" placeholder="e.g. 10000" value="30000">
+                            <span>₹</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="years"><i class="fas fa-calendar-alt"></i> Investment Duration</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="years" placeholder="e.g. 10" value="15">
+                            <span>years</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="toggle-group">
+                    <label style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-fire"></i> Include Inflation Adjustment
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="inflation-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div id="inflation-input" style="display: none; margin-top: 15px;">
+                    <div class="input-group">
+                        <label for="inflation-rate"><i class="fas fa-chart-pie"></i> Expected Inflation Rate</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="inflation-rate" placeholder="e.g. 6" value="6">
+                            <span>%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-calculate" onclick="calculateSWP()">
+                    <i class="fas fa-bolt"></i> Calculate SWP Projection
+                </button>
+            </div>
+        </div>
+        
+        <div id="result" class="result-card">
+            <div class="result-header">
+                <h3><i class="fas fa-chart-line"></i> Your SWP Results</h3>
+                <div id="status-badge" class="status-badge">
+                    <i class="fas fa-check-circle"></i> Healthy
+                </div>
+            </div>
+            
+            <div id="warning-banner" class="warning-banner" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div id="warning-text"></div>
+            </div>
+            
+            <div class="result-summary">
+                <div class="summary-item">
+                    <h4>Initial Investment</h4>
+                    <p id="summary-principal">₹50,00,000</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Total Withdrawn</h4>
+                    <p id="summary-withdrawn">₹54,00,000</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Final Balance</h4>
+                    <p id="summary-balance">₹42,15,300</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Duration Covered</h4>
+                    <p id="summary-duration">15 years</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="swpChart"></canvas>
+            </div>
+            
+            <h4 style="margin-bottom: 15px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-calendar-alt"></i> Yearly Breakdown
+            </h4>
+            <div style="overflow-x: auto;">
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Month</th>
+                            <th>Withdrawal (₹)</th>
+                            <th>Interest (₹)</th>
+                            <th>Balance (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-table-body">
+                        <tr>
+                            <td>1</td>
+                            <td>12</td>
+                            <td>₹3,60,000</td>
+                            <td>₹3,20,000</td>
+                            <td>₹49,60,000</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>60</td>
+                            <td>₹3,60,000</td>
+                            <td>₹3,10,000</td>
+                            <td>₹46,50,000</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>120</td>
+                            <td>₹3,60,000</td>
+                            <td>₹2,90,000</td>
+                            <td>₹42,80,000</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>180</td>
+                            <td>₹3,60,000</td>
+                            <td>₹2,15,300</td>
+                            <td>₹42,15,300</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <h4><i class="fas fa-lightbulb"></i> Smart Tip</h4>
+                <p id="smart-tip">Consider increasing your investment by 10% annually to combat inflation and maintain your purchasing power over time.</p>
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-percentage"></i> Withdrawal Rate Analysis</h4>
+                <p id="withdrawal-rate">Your withdrawal rate is 7.2% of your initial investment. A sustainable rate is typically between 4-6% annually.</p>
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-coins"></i> Interest Earnings</h4>
+                <p id="total-interest">You've earned ₹46,15,300 in interest over the investment period.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Professional SWP Calculator | Designed for Financial Planning</p>
+            <p>Disclaimer: This calculator provides estimates only. Actual results may vary based on market conditions.</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme switching functionality
+        const lightThemeBtn = document.getElementById('light-theme-btn');
+        const darkThemeBtn = document.getElementById('dark-theme-btn');
+        const body = document.body;
+        
+        lightThemeBtn.addEventListener('click', () => {
+            body.classList.remove('dark-theme');
+            body.classList.add('light-theme');
+            lightThemeBtn.classList.add('active');
+            darkThemeBtn.classList.remove('active');
+            localStorage.setItem('theme', 'light');
+            if (swpChart) updateChartColors();
+        });
+        
+        darkThemeBtn.addEventListener('click', () => {
+            body.classList.remove('light-theme');
+            body.classList.add('dark-theme');
+            darkThemeBtn.classList.add('active');
+            lightThemeBtn.classList.remove('active');
+            localStorage.setItem('theme', 'dark');
+            if (swpChart) updateChartColors();
+        });
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            darkThemeBtn.click();
+        } else {
+            lightThemeBtn.click();
+        }
+        
+        // Toggle inflation input visibility
+        document.getElementById('inflation-toggle').addEventListener('change', function() {
+            document.getElementById('inflation-input').style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Initialize chart
+        let swpChart = null;
+        
+        // Update chart colors based on theme
+        function updateChartColors() {
+            if (!swpChart) return;
+            
+            const isDarkTheme = body.classList.contains('dark-theme');
+            const chartColors = isDarkTheme ? {
+                balance: '#6366f1',
+                withdrawal: '#f472b6',
+                bg: 'rgba(99, 102, 241, 0.1)',
+                grid: 'rgba(255, 255, 255, 0.05)'
+            } : {
+                balance: '#4361ee',
+                withdrawal: '#f72585',
+                bg: 'rgba(67, 97, 238, 0.1)',
+                grid: 'rgba(0, 0, 0, 0.05)'
+            };
+            
+            swpChart.data.datasets[0].borderColor = chartColors.balance;
+            swpChart.data.datasets[0].backgroundColor = chartColors.bg;
+            swpChart.data.datasets[1].borderColor = chartColors.withdrawal;
+            
+            swpChart.options.scales.x.grid.color = chartColors.grid;
+            swpChart.options.scales.y.grid.color = chartColors.grid;
+            swpChart.options.scales.x.ticks.color = isDarkTheme ? '#94a3b8' : '#6c757d';
+            swpChart.options.scales.y.ticks.color = isDarkTheme ? '#94a3b8' : '#6c757d';
+            
+            swpChart.options.plugins.tooltip.backgroundColor = isDarkTheme ? '#1e293b' : '#ffffff';
+            swpChart.options.plugins.tooltip.titleColor = isDarkTheme ? '#e2e8f0' : '#343a40';
+            swpChart.options.plugins.tooltip.bodyColor = isDarkTheme ? '#e2e8f0' : '#343a40';
+            swpChart.options.plugins.tooltip.borderColor = isDarkTheme ? '#334155' : '#e9ecef';
+            
+            swpChart.update();
+        }
+        
+        // Create chart function
+        function createChart(labels, balanceData, withdrawalData) {
+            const ctx = document.getElementById('swpChart').getContext('2d');
+            const isDarkTheme = body.classList.contains('dark-theme');
+            
+            const chartColors = isDarkTheme ? {
+                balance: '#6366f1',
+                withdrawal: '#f472b6',
+                bg: 'rgba(99, 102, 241, 0.1)',
+                grid: 'rgba(255, 255, 255, 0.05)'
+            } : {
+                balance: '#4361ee',
+                withdrawal: '#f72585',
+                bg: 'rgba(67, 97, 238, 0.1)',
+                grid: 'rgba(0, 0, 0, 0.05)'
+            };
+            
+            if (swpChart) {
+                swpChart.destroy();
+            }
+            
+            swpChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Investment Balance',
+                            data: balanceData,
+                            borderColor: chartColors.balance,
+                            backgroundColor: chartColors.bg,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Cumulative Withdrawals',
+                            data: withdrawalData,
+                            borderColor: chartColors.withdrawal,
+                            backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: isDarkTheme ? '#e2e8f0' : '#343a40',
+                                font: {
+                                    size: 13
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: isDarkTheme ? '#1e293b' : '#ffffff',
+                            titleColor: isDarkTheme ? '#e2e8f0' : '#343a40',
+                            bodyColor: isDarkTheme ? '#e2e8f0' : '#343a40',
+                            borderColor: isDarkTheme ? '#334155' : '#e9ecef',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: chartColors.grid
+                            },
+                            ticks: {
+                                color: isDarkTheme ? '#94a3b8' : '#6c757d'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: chartColors.grid
+                            },
+                            ticks: {
+                                color: isDarkTheme ? '#94a3b8' : '#6c757d',
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Main calculation function
+        function calculateSWP() {
+            // Get input values
+            const principal = parseFloat(document.getElementById('principal').value) || 5000000;
+            let annualRate = (parseFloat(document.getElementById('rate').value) || 8) / 100;
+            let monthlyWithdrawal = parseFloat(document.getElementById('withdrawal').value) || 30000;
+            const years = parseFloat(document.getElementById('years').value) || 15;
+            const includeInflation = document.getElementById('inflation-toggle').checked;
+            const inflationRate = includeInflation ? (parseFloat(document.getElementById('inflation-rate').value) || 6) / 100 : 0;
+            
+            // Generate chart data
+            const labels = [];
+            const balanceData = [];
+            const withdrawalData = [];
+            
+            for (let i = 1; i <= years; i++) {
+                labels.push(`Year ${i}`);
+                // Simplified calculation for visualization
+                const balance = principal * Math.pow(1 + annualRate, i) - monthlyWithdrawal * 12 * i;
+                const withdrawals = monthlyWithdrawal * 12 * i;
+                
+                balanceData.push(Math.max(0, balance));
+                withdrawalData.push(withdrawals);
+            }
+            
+            // Create chart
+            createChart(labels, balanceData, withdrawalData);
+            
+            // Display results
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.classList.add('fade-in');
+            
+            // Scroll to results
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialize the calculator with default values
+        window.onload = function() {
+            // Set default inflation value
+            document.getElementById('inflation-rate').value = 6;
+            
+            // Create initial chart
+            const labels = ['Year 1', 'Year 5', 'Year 10', 'Year 15'];
+            const balanceData = [4960000, 4650000, 4280000, 4215300];
+            const withdrawalData = [360000, 1800000, 3600000, 5400000];
+            createChart(labels, balanceData, withdrawalData);
+        };
+    </script>
+</body>
+</html>
